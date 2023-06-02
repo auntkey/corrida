@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Corrida da pró Key</title>
+  <style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  #timer {
+    font-size: 48px;
+  }
+
+  #name-list {
+    margin-top: 20px;
+  }
+
+  .name-item {
+    margin-bottom: 10px;
+    margin-bottom: 10px;
+    padding-right: 10px;
+  }
+  button{
+    margin-bottom: 10px;
+    padding-right: 10px;  
+  }
+</style>
+</head>
+<body>
+  <h1>Corrida da pró Key</h1>
+  
+  <div>
+    <label for="duration">Tempo:</label>
+    <input type="number" id="duration" min="1" required>
+    <button onclick="startTimer()">Start</button>
+  </div>
+
+  <div id="timer"></div>
+
+  <div>
+    <label for="name">nome do grupo:</label>
+    <input type="text" id="name" required>
+    <button onclick="registerName()">Register</button>
+  </div>
+
+  <div id="name-list"></div>
+
+  <script>
+    var names = []; // Array to store registered names
+var startTime = null; // Start time of the countdown
+
+function startTimer() {
+  var durationInput = document.getElementById("duration");
+  var timerDiv = document.getElementById("timer");
+  var nameListDiv = document.getElementById("name-list");
+
+  var duration = parseInt(durationInput.value, 10);
+  if (isNaN(duration) || duration <= 0) {
+    alert("Please enter a valid duration.");
+    return;
+  }
+
+  var timer = duration * 60; // Convert minutes to seconds
+  var minutes, seconds;
+
+  startTime = new Date(); // Set the start time
+
+  var intervalId = setInterval(function() {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    timerDiv.textContent = minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      clearInterval(intervalId);
+      timerDiv.textContent = "Timer completed!";
+    }
+  }, 1000);
+}
+
+function registerName() {
+  var nameInput = document.getElementById("name");
+  var name = nameInput.value.trim();
+
+  if (name === "") {
+    alert("Please enter a valid name.");
+    return;
+  }
+
+  names.push(name);
+
+  var nameListDiv = document.getElementById("name-list");
+
+  var nameItemDiv = document.createElement("div");
+  nameItemDiv.classList.add("name-item");
+
+  var nameDiv = document.createElement("span");
+  nameDiv.textContent = name;
+  nameItemDiv.appendChild(nameDiv);
+
+  var timeButton = document.createElement("button");
+  timeButton.textContent = "terminou";
+  timeButton.addEventListener("click", function() {
+    calculateTimeSpent(name);
+  });
+  nameItemDiv.appendChild(timeButton);
+
+  nameListDiv.appendChild(nameItemDiv);
+
+  nameInput.value = ""; // Clear the input field
+}
+
+function calculateTimeSpent(name) {
+  if (startTime === null) {
+    alert("Please start the timer first.");
+    return;
+  }
+
+  var endTime = new Date(); // Current time
+  var timeDiff = endTime - startTime; // Time difference in milliseconds
+
+  var seconds = Math.floor(timeDiff / 1000);
+  var minutes = Math.floor(seconds / 60);
+  seconds = seconds % 60;
+
+  var timeSpent = minutes + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+  var nameListDiv = document.getElementById("name-list");
+  var nameItems = nameListDiv.getElementsByClassName("name-item");
+
+  for (var i = 0; i < nameItems.length; i++) {
+    var nameDiv = nameItems[i].querySelector("span");
+
+    if (nameDiv.textContent === name) {
+      var timeSpentDiv = nameItems[i].querySelector(".time-spent");
+
+      if (timeSpentDiv) {
+        timeSpentDiv.textContent = "fizeram a atividade em: " + timeSpent;
+      } else {
+        timeSpentDiv = document.createElement("div");
+        timeSpentDiv.classList.add("time-spent");
+        timeSpentDiv.textContent = "fizeram a atividade em: " + timeSpent;
+        nameItems[i].appendChild(timeSpentDiv);
+      }
+      break;
+    }
+  }
+}
+  </script>
+</body>
+</html>
